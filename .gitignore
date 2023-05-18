@@ -1,0 +1,5 @@
+# build tree
+build
+
+# cache of intelli-stuffs
+.cache
