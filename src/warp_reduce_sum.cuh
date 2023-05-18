@@ -8,7 +8,7 @@ namespace rd {
 template <typename T>
 __device__ __forceinline__ T warp_reduce_sum(uint32_t mask, T acc) {
   for (int off = warpSize / 2; off > 0; off /= 2) {
-    acc += __shfl_down_sync(mask, acc, offset);
+    acc += __shfl_down_sync(mask, acc, off);
   }
   return acc;
 }
