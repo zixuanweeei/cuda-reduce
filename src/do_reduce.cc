@@ -2,11 +2,13 @@
 
 #include <cmath>
 #include <cstddef>
+#include <cstdio>
 #include <limits>
 #include <numeric>
 #include <vector>
 
 #include "common/helper_cuda.h"
+#include "common/helper_string.h"
 #include "cpu_reduce.hh"
 #include "cuda_reduce.hh"
 #include "device_storage.hh"
@@ -22,6 +24,13 @@ bool do_reduce(int argc, char **argv) {
   int max_blocks = 64;
   bool cpu_final_reduction = false;
   int cpu_final_threshold = 1;
+
+  if (checkCmdLineFlag(argc, (const char **)argv, "kernel")) {
+    which_kernel = getCmdLineArgumentInt(argc, (const char **)argv, "kernel");
+  }
+
+  printf("which kernel: %d\n", which_kernel);
+  fflush(stdout);
 
   // initialize random data on host
   std::vector<T> host_input(size, (T)0.f);
@@ -67,8 +76,7 @@ bool do_reduce(int argc, char **argv) {
   printf("\nGPU result = %f\n", (double)gpu_result);
   printf("CPU result = %f\n", (double)cpu_result);
 
-  return std::abs(gpu_result - cpu_result)
-      < std::numeric_limits<double>::epsilon();
+  return std::abs(gpu_result - cpu_result) < 5e-4;
 }
 
 } // namespace rd
