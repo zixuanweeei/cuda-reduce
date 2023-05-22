@@ -20,6 +20,19 @@ __global__ void reduce0(T *in, T *out, uint32_t numel) {
   cg::sync(cta);
 
   for (uint32_t sidx = 1; sidx < blockDim.x; sidx *= 2) {
+    // Interleaving active threads using the modulo.
+    //
+    // 0 1 2 3 4 5 6 7 ...
+    // |/  |/  |/  |/
+    // 0   2   4   6 ...
+    // |  /    |  /
+    // | /     | /
+    // 0       4 ...
+    // |....../
+    // 0
+    //
+    // In this case, no whole warps is active which causes high warp divergency.
+    // Besides, the `%` is very slow.
     if ((tid % (2 * sidx)) == 0) smem[tid] += smem[tid + sidx];
 
     cg::sync(cta);
