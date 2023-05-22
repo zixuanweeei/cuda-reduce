@@ -64,4 +64,44 @@ void get_num_blocks_and_threads(int32_t which_kernel, int32_t n,
       "The selected block and thread numbers are (%d, %d)\n", blocks, threads);
 }
 
+int get_env(const char *name, char *buffer, size_t buffer_size) {
+  if (!name || buffer_size == 0 || !buffer) return -1;
+
+  int writen = 0;
+  int terminated_idx = 0;
+  size_t value_len = 0;
+
+  const char *value = ::getenv(name);
+  value_len = value == nullptr ? 0 : strlen(value);
+
+  if (value_len > INT_MAX) {
+    // integer overflow
+    writen = -1;
+  } else {
+    int int_value_len = static_cast<int>(value_len);
+    if (value_len >= buffer_size) {
+      // buffer overflow
+      writen = -int_value_len;
+    } else {
+      terminated_idx = int_value_len;
+      writen = int_value_len;
+
+      if (value) strncpy(buffer, value, buffer_size - 1);
+    }
+  }
+
+  if (buffer) buffer[terminated_idx] = '\0';
+  return writen;
+}
+
+int get_env_int(const char *name, int default_value) {
+  int value = default_value;
+  // len(str(INT_MIN)) + terminated == 12
+  constexpr int len = 12;
+  char str[len] = {'\0'};
+
+  if (get_env(name, str, len) > 0) value = std::atoi(str);
+  return value;
+}
+
 } // namespace rd
