@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "cuda_reduce.hh"
 #include "cuda_reduce/cuda_reduce.cuh"
 
@@ -13,7 +15,16 @@ void cuda_reduce(int32_t numel, int32_t num_threads, int32_t num_blocks,
   int32_t smem_size = (num_threads <= 32) ? (2 * num_threads * sizeof(T))
                                           : (num_threads * sizeof(T));
 
-  reduce0<T><<<dim_grid, dim_block, smem_size>>>(in, out, numel);
+  switch (which_kern) {
+    case 0:
+      reduce0<T><<<dim_grid, dim_block, smem_size>>>(in, out, numel);
+      break;
+    case 1:
+      reduce1<T><<<dim_grid, dim_block, smem_size>>>(in, out, numel);
+      break;
+
+    default: assert(!"not implemented");
+  }
 }
 
 template void cuda_reduce<int32_t>(int32_t numel, int32_t num_threads,

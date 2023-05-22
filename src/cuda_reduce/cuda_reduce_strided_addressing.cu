@@ -34,7 +34,7 @@ __global__ void reduce1(T *in, T *out, uint32_t numel) {
     int32_t idx = 2 * stride * tid;
 
     // The strided addressing results in many shared memory back conflicts.
-    if (idx < blockDim.x) { smem[idx] = smem[idx + stride]; }
+    if (idx < blockDim.x) { smem[idx] += smem[idx + stride]; }
 
     cg::sync(cta);
   }
