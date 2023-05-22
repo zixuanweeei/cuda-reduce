@@ -22,6 +22,9 @@ void cuda_reduce(int32_t numel, int32_t num_threads, int32_t num_blocks,
     case 1:
       reduce1<T><<<dim_grid, dim_block, smem_size>>>(in, out, numel);
       break;
+    case 2:
+      reduce2<T><<<dim_grid, dim_block, smem_size>>>(in, out, numel);
+      break;
 
     default: assert(!"not implemented");
   }
