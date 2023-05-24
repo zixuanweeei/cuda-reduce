@@ -12,7 +12,7 @@ namespace cg = cooperative_groups;
 
 namespace rd {
 
-/// Use half threads to do reduction. Unrolled version + grid strides.
+/// https://developer.nvidia.com/blog/faster-parallel-reductions-kepler/
 template <typename T, uint32_t block_size, bool is_pow2>
 __global__ void reduce7(T *in, T *out, uint32_t numel) {
   cg::thread_block cta = cg::this_thread_block();
