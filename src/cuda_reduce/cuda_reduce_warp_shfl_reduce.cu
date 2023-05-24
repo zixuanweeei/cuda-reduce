@@ -205,6 +205,8 @@ __global__ void reduce6(T *in, T *out, uint32_t numel) {
     uint32_t i = blockDim.x * 2 * blockIdx.x + threadIdx.x;
     grid_size <<= 1;
 
+    // Grid-Stride Loop. Please refer to
+    // https://developer.nvidia.com/blog/cuda-pro-tip-write-flexible-kernels-grid-stride-loops/
     while (i < numel) {
       sum += in[i];
 
