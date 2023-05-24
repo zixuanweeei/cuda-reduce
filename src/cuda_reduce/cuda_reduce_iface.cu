@@ -101,6 +101,10 @@ void cuda_reduce(int32_t numel, int32_t num_threads, int32_t num_blocks,
         cuda_reduce_arbirary_blocks<T, 4>(
             numel, num_threads, num_blocks, in, out);
         break;
+      case 5:
+        cuda_reduce_arbirary_blocks<T, 5>(
+            numel, num_threads, num_blocks, in, out);
+        break;
 
       default: assert(!"not implemented");
     }
