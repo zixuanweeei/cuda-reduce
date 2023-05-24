@@ -61,9 +61,8 @@ bool do_reduce(int argc, char **argv) {
   checkCudaErrors(cudaMemcpy(ds_output.data(), host_input.data(),
       num_blocks * sizeof(T), cudaMemcpyHostToDevice));
 
-  CP_TIMEIT(0,
-      cuda_reduce<T>(size, num_threads, num_blocks, which_kernel,
-          ds_input.data<T>(), ds_output.data<T>()));
+  cuda_reduce<T>(size, num_threads, num_blocks, which_kernel,
+      ds_input.data<T>(), ds_output.data<T>());
   checkCudaErrors(cudaDeviceSynchronize());
 
   checkCudaErrors(cudaMemcpy(host_output.data(), ds_output.data(),
