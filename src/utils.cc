@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cuda.h>
 #include <cuda_runtime_api.h>
 
@@ -6,6 +7,7 @@
 #include <cstdio>
 
 #include "common/helper_cuda.h"
+#include "utils.hh"
 
 namespace rd {
 
@@ -102,6 +104,10 @@ int get_env_int(const char *name, int default_value) {
 
   if (get_env(name, str, len) > 0) value = std::atoi(str);
   return value;
+}
+
+bool is_pow2(int32_t n) {
+  return std::ceil(std::log2f(n)) == std::floor(std::log2f(n));
 }
 
 } // namespace rd

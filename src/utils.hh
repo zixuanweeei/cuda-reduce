@@ -19,6 +19,8 @@ int get_env(const char *name, char *buffer, size_t buffer_size);
 
 int get_env_int(const char *name, int default_value);
 
+bool is_pow2(int32_t n);
+
 #define CP_TIMEIT(stream, ...) \
   do { \
     if (get_env_int("CP_PROFILE", 0)) { \

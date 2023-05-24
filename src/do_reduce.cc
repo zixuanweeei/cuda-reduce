@@ -29,6 +29,19 @@ bool do_reduce(int argc, char **argv) {
     which_kernel = getCmdLineArgumentInt(argc, (const char **)argv, "kernel");
   }
 
+  if (checkCmdLineFlag(argc, (const char **)argv, "threads")) {
+    max_threads = getCmdLineArgumentInt(argc, (const char **)argv, "threads");
+  }
+
+  if (checkCmdLineFlag(argc, (const char **)argv, "max_blocks")) {
+    max_blocks
+        = getCmdLineArgumentInt(argc, (const char **)argv, "max_blocks");
+  }
+
+  if (checkCmdLineFlag(argc, (const char **)argv, "n")) {
+    size = getCmdLineArgumentInt(argc, (const char **)argv, "n");
+  }
+
   printf("which kernel: %d\n", which_kernel);
   fflush(stdout);
 
