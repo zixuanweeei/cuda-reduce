@@ -1,7 +1,8 @@
 #pragma once
 
+#include <cuda_runtime_api.h>
+
 #include <cstddef>
-#include <crt/device_functions.h>
 
 namespace rd {
 
