@@ -28,4 +28,12 @@ struct reduce {
       uint32_t numel);
 };
 
+namespace utils {
+
+__host__ __device__ __forceinline__ bool cu_is_pow2(int32_t n) {
+  return ceil(log2f(n)) == floor(log2f(n));
+}
+
+} // namespace utils
+
 } // namespace rd
