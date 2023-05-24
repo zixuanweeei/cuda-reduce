@@ -17,7 +17,7 @@ struct reduce_kern_exec {
   }
 };
 
-template <typename T, int kern_no = 4>
+template <typename T, int kern_no = 4, int max_blocks = 512>
 void cuda_reduce_arbirary_blocks(
     int numel, int num_threads, int num_blocks, T *in, T *out) {
   // launch config
@@ -26,6 +26,12 @@ void cuda_reduce_arbirary_blocks(
 
   int32_t smem_size = (num_threads <= 32) ? (2 * num_threads * sizeof(T))
                                           : (num_threads * sizeof(T));
+
+  if (max_blocks >= 1024 && num_threads == 1024) {
+    reduce_kern_exec<T, kern_no, 1024> {}(
+        dim_grid, dim_block, smem_size, in, out, numel);
+    return;
+  }
 
   switch (num_threads) {
     case 512:
@@ -107,6 +113,10 @@ void cuda_reduce(int32_t numel, int32_t num_threads, int32_t num_blocks,
         break;
       case 6:
         cuda_reduce_arbirary_blocks<T, 6>(
+            numel, num_threads, num_blocks, in, out);
+        break;
+      case 7:
+        cuda_reduce_arbirary_blocks<T, 7, 1024>(
             numel, num_threads, num_blocks, in, out);
         break;
 
