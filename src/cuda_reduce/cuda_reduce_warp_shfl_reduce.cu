@@ -2,7 +2,6 @@
 #include <cooperative_groups/reduce.h>
 
 #include <cstdint>
-#include <cstdio>
 
 #include "cuda_reduce/cuda_reduce.cuh"
 #include "shared_memory.cuh"
@@ -39,6 +38,11 @@ __global__ void reduce4(T *in, T *out, uint32_t numel) {
       smem[tid] = sum;
     }
 
+    // This synchronization happens among the reductions in multiple wraps. At
+    // the last level reduction, say strides <= 32, there is only a active warp
+    // deriving the very final result where the instructions are executed
+    // sychronously as if SIMD instructions. Therefore, `cg::sync()` is not
+    // needed.
     cg::sync(cta);
   }
 
