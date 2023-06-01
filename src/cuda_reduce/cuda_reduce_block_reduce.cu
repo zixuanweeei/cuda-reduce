@@ -22,7 +22,7 @@ __global__ void reduce7(T *in, T *out, uint32_t numel) {
   uint32_t grid_size = blockDim.x * gridDim.x;
   uint32_t mask_len = (block_size & 31);
   mask_len = (mask_len > 0) ? (32 - mask_len) : mask_len;
-  const uint32_t mask = (0xffffffff) >> mask_len;
+  const uint32_t mask = (0xff'ff'ff'ff) >> mask_len;
 
   T sum = 0;
 

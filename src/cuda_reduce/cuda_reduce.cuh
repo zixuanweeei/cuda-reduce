@@ -28,6 +28,9 @@ struct reduce {
       uint32_t numel);
 };
 
+template <typename T>
+__global__ void cg_reduce(T *in, T *out, uint32_t numel);
+
 namespace utils {
 
 __host__ __device__ __forceinline__ bool cu_is_pow2(int32_t n) {
