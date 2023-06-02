@@ -104,15 +104,15 @@ void cuda_reduce(int32_t numel, int32_t num_threads, int32_t num_blocks,
         reduce3<T><<<dim_grid, dim_block, smem_size>>>(in, out, numel);
         break;
       case 4:
-        cuda_reduce_arbirary_blocks<T, 4>(
+        cuda_reduce_arbirary_blocks<T, 4, 1024>(
             numel, num_threads, num_blocks, in, out);
         break;
       case 5:
-        cuda_reduce_arbirary_blocks<T, 5>(
+        cuda_reduce_arbirary_blocks<T, 5, 1024>(
             numel, num_threads, num_blocks, in, out);
         break;
       case 6:
-        cuda_reduce_arbirary_blocks<T, 6>(
+        cuda_reduce_arbirary_blocks<T, 6, 1024>(
             numel, num_threads, num_blocks, in, out);
         break;
       case 7:

@@ -68,6 +68,7 @@ struct reduce<T, block_size, 4> {
   }
 };
 
+template struct reduce<int, 1024, 4>;
 template struct reduce<int, 512, 4>;
 template struct reduce<int, 256, 4>;
 template struct reduce<int, 128, 4>;
@@ -79,6 +80,7 @@ template struct reduce<int, 4, 4>;
 template struct reduce<int, 2, 4>;
 template struct reduce<int, 1, 4>;
 
+template struct reduce<float, 1024, 4>;
 template struct reduce<float, 512, 4>;
 template struct reduce<float, 256, 4>;
 template struct reduce<float, 128, 4>;
@@ -90,6 +92,7 @@ template struct reduce<float, 4, 4>;
 template struct reduce<float, 2, 4>;
 template struct reduce<float, 1, 4>;
 
+template struct reduce<double, 1024, 4>;
 template struct reduce<double, 512, 4>;
 template struct reduce<double, 256, 4>;
 template struct reduce<double, 128, 4>;
@@ -116,6 +119,12 @@ __global__ void reduce5(T *in, T *out, uint32_t numel) {
   if (i + block_size < numel) sum += in[i + block_size];
 
   smem[tid] = sum;
+  cg::sync(cta);
+
+  if (block_size >= 1024 && tid < 512) {
+    sum += smem[tid + 512];
+    smem[tid] = sum;
+  }
   cg::sync(cta);
 
   if (block_size >= 512 && tid < 256) {
@@ -157,6 +166,7 @@ struct reduce<T, block_size, 5> {
   }
 };
 
+template struct reduce<int, 1024, 5>;
 template struct reduce<int, 512, 5>;
 template struct reduce<int, 256, 5>;
 template struct reduce<int, 128, 5>;
@@ -168,6 +178,7 @@ template struct reduce<int, 4, 5>;
 template struct reduce<int, 2, 5>;
 template struct reduce<int, 1, 5>;
 
+template struct reduce<float, 1024, 5>;
 template struct reduce<float, 512, 5>;
 template struct reduce<float, 256, 5>;
 template struct reduce<float, 128, 5>;
@@ -179,6 +190,7 @@ template struct reduce<float, 4, 5>;
 template struct reduce<float, 2, 5>;
 template struct reduce<float, 1, 5>;
 
+template struct reduce<double, 1024, 5>;
 template struct reduce<double, 512, 5>;
 template struct reduce<double, 256, 5>;
 template struct reduce<double, 128, 5>;
@@ -226,6 +238,12 @@ __global__ void reduce6(T *in, T *out, uint32_t numel) {
   smem[tid] = sum;
   cg::sync(cta);
 
+  if (block_size >= 1024 && tid < 512) {
+    sum += smem[tid + 512];
+    smem[tid] = sum;
+  }
+  cg::sync(cta);
+
   if (block_size >= 512 && tid < 256) {
     sum += smem[tid + 256];
     smem[tid] = sum;
@@ -271,6 +289,7 @@ struct reduce<T, block_size, 6> {
   }
 };
 
+template struct reduce<int, 1024, 6>;
 template struct reduce<int, 512, 6>;
 template struct reduce<int, 256, 6>;
 template struct reduce<int, 128, 6>;
@@ -282,6 +301,7 @@ template struct reduce<int, 4, 6>;
 template struct reduce<int, 2, 6>;
 template struct reduce<int, 1, 6>;
 
+template struct reduce<float, 1024, 6>;
 template struct reduce<float, 512, 6>;
 template struct reduce<float, 256, 6>;
 template struct reduce<float, 128, 6>;
@@ -293,6 +313,7 @@ template struct reduce<float, 4, 6>;
 template struct reduce<float, 2, 6>;
 template struct reduce<float, 1, 6>;
 
+template struct reduce<double, 1024, 6>;
 template struct reduce<double, 512, 6>;
 template struct reduce<double, 256, 6>;
 template struct reduce<double, 128, 6>;
