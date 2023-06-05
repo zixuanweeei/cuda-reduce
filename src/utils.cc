@@ -25,11 +25,12 @@ uint32_t next_pow2(uint32_t x) {
 ////////////////////////////////////////////////////////////////////////////////
 // Compute the number of threads and blocks to use for the given reduction
 // kernel For the kernels >= 3, we set threads / block to the minimum of
-// max_threads and n/2. For kernels < 3, we set to the minimum of max_threads and
-// n.  For kernel 6, we observe the maximum specified number of blocks, because
-// each thread in that kernel can process a variable number of elements.
+// max_threads and numel/2. For kernels < 3, we set to the minimum of
+// max_threads and numel.  For kernel 6, we observe the maximum specified number
+// of blocks, because each thread in that kernel can process a variable number
+// of elements.
 ////////////////////////////////////////////////////////////////////////////////
-void get_num_blocks_and_threads(int32_t which_kernel, int32_t n,
+void get_num_blocks_and_threads(int32_t which_kernel, int32_t numel,
     int32_t max_blocks, int32_t max_threads, int32_t &blocks,
     int32_t &threads) {
   // get device capability, to avoid block/grid size exceed the upper bound
@@ -39,16 +40,17 @@ void get_num_blocks_and_threads(int32_t which_kernel, int32_t n,
   checkCudaErrors(cudaGetDeviceProperties(&prop, device));
 
   if (which_kernel < 3) {
-    threads = (n < max_threads) ? next_pow2(n) : max_threads;
-    blocks = (n + threads - 1) / threads;
+    threads = (numel < max_threads) ? next_pow2(numel) : max_threads;
+    blocks = (numel + threads - 1) / threads;
   } else {
-    threads = (n < max_threads * 2) ? next_pow2((n + 1) / 2) : max_threads;
-    blocks = (n + (threads * 2 - 1)) / (threads * 2);
+    threads
+        = (numel < max_threads * 2) ? next_pow2((numel + 1) / 2) : max_threads;
+    blocks = (numel + (threads * 2 - 1)) / (threads * 2);
   }
 
   if ((float)threads * blocks
       > (float)prop.maxGridSize[0] * prop.maxThreadsPerBlock) {
-    printf("n is too large, please choose a smaller number!\n");
+    printf("numel is too large, please choose a smaller number!\n");
   }
 
   if (blocks > prop.maxGridSize[0]) {
@@ -106,8 +108,8 @@ int get_env_int(const char *name, int default_value) {
   return value;
 }
 
-bool is_pow2(int32_t n) {
-  return std::ceil(std::log2f(n)) == std::floor(std::log2f(n));
+bool is_pow2(int32_t numel) {
+  return std::ceil(std::log2f(numel)) == std::floor(std::log2f(numel));
 }
 
 } // namespace rd
