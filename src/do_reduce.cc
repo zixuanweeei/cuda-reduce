@@ -81,8 +81,7 @@ bool do_reduce(int argc, char **argv) {
   checkCudaErrors(cudaMemcpy(host_output.data(), ds_output.data(),
       num_blocks * sizeof(T), cudaMemcpyDeviceToHost));
 
-  T gpu_result
-      = std::accumulate(host_output.begin(), host_output.end(), T(0.f));
+  T gpu_result = host_output[0];
 
   T cpu_result = cpu_reduce(host_input.data(), size);
 

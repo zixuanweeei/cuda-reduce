@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cstdio>
 
+#include "common/helper_cuda.h"
 #include "cuda_reduce.hh"
 #include "cuda_reduce/cuda_reduce.cuh"
 #include "utils.hh"
@@ -126,6 +127,8 @@ void cuda_reduce(int32_t numel, int32_t num_threads, int32_t num_blocks,
       default: assert(!"not implemented");
     }
   });
+
+  getLastCudaError("kernel execution failed");
 }
 
 template void cuda_reduce<int32_t>(int32_t numel, int32_t num_threads,

@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "cuda_reduce/cuda_reduce.cuh"
+#include "cuda_reduce/cuda_reduce_last_block_clean.cuh"
 #include "shared_memory.cuh"
 #include "utils.hh"
 
@@ -58,6 +59,7 @@ __global__ void reduce4(T *in, T *out, uint32_t numel) {
   }
 
   if (cta.thread_rank() == 0) { out[blockIdx.x] = sum; }
+  reduce_last_block_clean(smem, out);
 }
 
 template <typename T, uint32_t block_size>
@@ -156,6 +158,7 @@ __global__ void reduce5(T *in, T *out, uint32_t numel) {
   }
 
   if (cta.thread_rank() == 0) { out[blockIdx.x] = sum; }
+  reduce_last_block_clean(smem, out);
 }
 
 template <typename T, uint32_t block_size>
@@ -273,6 +276,7 @@ __global__ void reduce6(T *in, T *out, uint32_t numel) {
   }
 
   if (cta.thread_rank() == 0) { out[blockIdx.x] = sum; }
+  reduce_last_block_clean(smem, out);
 }
 
 template <typename T, uint32_t block_size>

@@ -2,6 +2,7 @@
 #include <cooperative_groups/reduce.h>
 
 #include "cuda_reduce/cuda_reduce.cuh"
+#include "cuda_reduce/cuda_reduce_last_block_clean.cuh"
 #include "shared_memory.cuh"
 
 namespace cg = cooperative_groups;
@@ -40,6 +41,7 @@ __global__ void reduce1(T *in, T *out, uint32_t numel) {
   }
 
   if (tid == 0) out[blockIdx.x] = smem[0];
+  reduce_last_block_clean(smem, out);
 }
 
 template __global__ void reduce1<float>(float *in, float *out, uint32_t numel);
