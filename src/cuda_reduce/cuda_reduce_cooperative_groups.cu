@@ -21,7 +21,8 @@ __device__ T cg_reduce_n(T in, Group &threads) {
 }
 
 template <typename T>
-__global__ void cg_reduce(T *in, T *out, uint32_t numel) {
+__global__ void cg_reduce(
+    T *in, T *out, uint32_t numel, bool clean_final_block) {
   T *smem = shared_memory_t<T> {};
   // Handle to thread block group
   cg::thread_block cta = cg::this_thread_block();
@@ -67,15 +68,15 @@ __global__ void cg_reduce(T *in, T *out, uint32_t numel) {
   }
 
   if (thread_rank == 0) out[blockIdx.x] = local_sum;
-  reduce_last_block_clean(smem, out);
+  if (clean_final_block) reduce_last_block_clean(smem, out);
 }
 
 template __global__ void cg_reduce<float>(
-    float *in, float *out, uint32_t numel);
+    float *in, float *out, uint32_t numel, bool);
 template __global__ void cg_reduce<int32_t>(
-    int32_t *in, int32_t *out, uint32_t numel);
+    int32_t *in, int32_t *out, uint32_t numel, bool);
 template __global__ void cg_reduce<double>(
-    double *in, double *out, uint32_t numel);
+    double *in, double *out, uint32_t numel, bool);
 
 template <class T, size_t BlockSize, size_t MultiWarpGroupSize>
 __global__ void multi_warp_cg_reduce(T *in, T *out, uint32_t n) {

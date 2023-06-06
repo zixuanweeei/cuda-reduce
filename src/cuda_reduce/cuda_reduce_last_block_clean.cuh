@@ -1,6 +1,8 @@
 #include <cuda.h>
 #include <cuda_runtime_api.h>
 
+#include <cstdio>
+
 #include "warp_reduce_sum.cuh"
 
 namespace rd {

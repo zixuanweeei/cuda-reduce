@@ -14,7 +14,8 @@ namespace rd {
 
 /// Use half threads to do reduction.
 template <typename T, uint32_t block_size>
-__global__ void reduce4(T *in, T *out, uint32_t numel) {
+__global__ void reduce4(
+    T *in, T *out, uint32_t numel, bool clean_final_block) {
   cg::thread_block cta = cg::this_thread_block();
   T *smem = shared_memory_t<T> {};
 
@@ -59,14 +60,15 @@ __global__ void reduce4(T *in, T *out, uint32_t numel) {
   }
 
   if (cta.thread_rank() == 0) { out[blockIdx.x] = sum; }
-  reduce_last_block_clean(smem, out);
+  if (clean_final_block) reduce_last_block_clean(smem, out);
 }
 
 template <typename T, uint32_t block_size>
 struct reduce<T, block_size, 4> {
   void doit(dim3 dim_grid, dim3 dim_block, uint32_t smem_size, T *in, T *out,
-      uint32_t numel) {
-    reduce4<T, block_size><<<dim_grid, dim_block, smem_size>>>(in, out, numel);
+      uint32_t numel, bool clean_final_block) {
+    reduce4<T, block_size><<<dim_grid, dim_block, smem_size>>>(
+        in, out, numel, clean_final_block);
   }
 };
 
@@ -108,7 +110,8 @@ template struct reduce<double, 1, 4>;
 
 /// Use half threads to do reduction. Unrolled version.
 template <typename T, uint32_t block_size>
-__global__ void reduce5(T *in, T *out, uint32_t numel) {
+__global__ void reduce5(
+    T *in, T *out, uint32_t numel, bool clean_final_block) {
   cg::thread_block cta = cg::this_thread_block();
   T *smem = shared_memory_t<T> {};
 
@@ -158,14 +161,15 @@ __global__ void reduce5(T *in, T *out, uint32_t numel) {
   }
 
   if (cta.thread_rank() == 0) { out[blockIdx.x] = sum; }
-  reduce_last_block_clean(smem, out);
+  if (clean_final_block) reduce_last_block_clean(smem, out);
 }
 
 template <typename T, uint32_t block_size>
 struct reduce<T, block_size, 5> {
   void doit(dim3 dim_grid, dim3 dim_block, uint32_t smem_size, T *in, T *out,
-      uint32_t numel) {
-    reduce5<T, block_size><<<dim_grid, dim_block, smem_size>>>(in, out, numel);
+      uint32_t numel, bool clean_final_block) {
+    reduce5<T, block_size><<<dim_grid, dim_block, smem_size>>>(
+        in, out, numel, clean_final_block);
   }
 };
 
@@ -207,7 +211,8 @@ template struct reduce<double, 1, 5>;
 
 /// Use half threads to do reduction. Unrolled version + grid strides.
 template <typename T, uint32_t block_size, bool is_pow2>
-__global__ void reduce6(T *in, T *out, uint32_t numel) {
+__global__ void reduce6(
+    T *in, T *out, uint32_t numel, bool clean_final_block) {
   cg::thread_block cta = cg::this_thread_block();
   T *smem = shared_memory_t<T> {};
 
@@ -276,19 +281,19 @@ __global__ void reduce6(T *in, T *out, uint32_t numel) {
   }
 
   if (cta.thread_rank() == 0) { out[blockIdx.x] = sum; }
-  reduce_last_block_clean(smem, out);
+  if (clean_final_block) reduce_last_block_clean(smem, out);
 }
 
 template <typename T, uint32_t block_size>
 struct reduce<T, block_size, 6> {
   void doit(dim3 dim_grid, dim3 dim_block, uint32_t smem_size, T *in, T *out,
-      uint32_t numel) {
+      uint32_t numel, bool clean_final_block) {
     if (is_pow2(numel)) {
-      reduce6<T, block_size, true>
-          <<<dim_grid, dim_block, smem_size>>>(in, out, numel);
+      reduce6<T, block_size, true><<<dim_grid, dim_block, smem_size>>>(
+          in, out, numel, clean_final_block);
     } else {
-      reduce6<T, block_size, false>
-          <<<dim_grid, dim_block, smem_size>>>(in, out, numel);
+      reduce6<T, block_size, false><<<dim_grid, dim_block, smem_size>>>(
+          in, out, numel, clean_final_block);
     }
   }
 };

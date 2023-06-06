@@ -15,7 +15,8 @@ namespace rd {
 
 /// https://developer.nvidia.com/blog/faster-parallel-reductions-kepler/
 template <typename T, uint32_t block_size, bool is_pow2>
-__global__ void reduce7(T *in, T *out, uint32_t numel) {
+__global__ void reduce7(
+    T *in, T *out, uint32_t numel, bool clean_final_block) {
   cg::thread_block cta = cg::this_thread_block();
   T *smem = shared_memory_t<T> {};
 
@@ -63,20 +64,20 @@ __global__ void reduce7(T *in, T *out, uint32_t numel) {
   }
 
   if (cta.thread_rank() == 0) { out[blockIdx.x] = sum; }
-  reduce_last_block_clean(smem, out);
+  if (clean_final_block) reduce_last_block_clean(smem, out);
 }
 
 template <typename T, uint32_t block_size>
 struct reduce<T, block_size, 7> {
   void doit(dim3 dim_grid, dim3 dim_block, uint32_t smem_size, T *in, T *out,
-      uint32_t numel) {
+      uint32_t numel, bool clean_final_block) {
     smem_size = ((dim_block.x / 32) + 1) * sizeof(T);
     if (is_pow2(numel)) {
-      reduce7<T, block_size, true>
-          <<<dim_grid, dim_block, smem_size>>>(in, out, numel);
+      reduce7<T, block_size, true><<<dim_grid, dim_block, smem_size>>>(
+          in, out, numel, clean_final_block);
     } else {
-      reduce7<T, block_size, false>
-          <<<dim_grid, dim_block, smem_size>>>(in, out, numel);
+      reduce7<T, block_size, false><<<dim_grid, dim_block, smem_size>>>(
+          in, out, numel, clean_final_block);
     }
   }
 };

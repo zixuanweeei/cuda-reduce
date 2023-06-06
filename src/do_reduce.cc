@@ -24,6 +24,7 @@ bool do_reduce(int argc, char **argv) {
   int max_blocks = 64;
   bool cpu_final_reduction = false;
   int cpu_final_threshold = 1;
+  bool clean_final_block = false;
 
   if (checkCmdLineFlag(argc, (const char **)argv, "kernel")) {
     which_kernel = getCmdLineArgumentInt(argc, (const char **)argv, "kernel");
@@ -42,7 +43,13 @@ bool do_reduce(int argc, char **argv) {
     size = getCmdLineArgumentInt(argc, (const char **)argv, "n");
   }
 
+  if (checkCmdLineFlag(argc, (const char **)argv, "final_reduce")) {
+    clean_final_block
+        = getCmdLineArgumentInt(argc, (const char **)argv, "final_reduce");
+  }
+
   printf("which kernel: %d\n", which_kernel);
+  printf("do final block reduction: %s\n", clean_final_block ? "yes" : "no");
   fflush(stdout);
 
   // initialize random data on host
@@ -75,13 +82,15 @@ bool do_reduce(int argc, char **argv) {
       num_blocks * sizeof(T), cudaMemcpyHostToDevice));
 
   cuda_reduce<T>(size, num_threads, num_blocks, which_kernel,
-      ds_input.data<T>(), ds_output.data<T>());
+      ds_input.data<T>(), ds_output.data<T>(), clean_final_block);
   checkCudaErrors(cudaDeviceSynchronize());
 
   checkCudaErrors(cudaMemcpy(host_output.data(), ds_output.data(),
       num_blocks * sizeof(T), cudaMemcpyDeviceToHost));
 
-  T gpu_result = host_output[0];
+  T gpu_result = clean_final_block
+      ? host_output[0]
+      : std::accumulate(host_output.begin(), host_output.end(), T(0.f));
 
   T cpu_result = cpu_reduce(host_input.data(), size);
 

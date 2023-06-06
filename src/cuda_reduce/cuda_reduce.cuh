@@ -8,28 +8,29 @@
 namespace rd {
 
 template <typename T>
-__global__ void reduce0(T *in, T *out, uint32_t numel);
+__global__ void reduce0(T *in, T *out, uint32_t numel, bool clean_final_block);
 
 template <typename T>
-__global__ void reduce1(T *in, T *out, uint32_t numel);
+__global__ void reduce1(T *in, T *out, uint32_t numel, bool clean_final_block);
 
 template <typename T>
-__global__ void reduce2(T *in, T *out, uint32_t numel);
+__global__ void reduce2(T *in, T *out, uint32_t numel, bool clean_final_block);
 
 template <typename T>
-__global__ void reduce3(T *in, T *out, uint32_t numel);
+__global__ void reduce3(T *in, T *out, uint32_t numel, bool clean_final_block);
 
 template <typename T, uint32_t threads>
-__global__ void reduce4(T *in, T *out, uint32_t numel);
+__global__ void reduce4(T *in, T *out, uint32_t numel, bool clean_final_block);
 
 template <typename T, uint32_t threads, int kern_no>
 struct reduce {
   void doit(dim3 dim_grid, dim3 dim_block, uint32_t smem_size, T *in, T *out,
-      uint32_t numel);
+      uint32_t numel, bool clean_final_block);
 };
 
 template <typename T>
-__global__ void cg_reduce(T *in, T *out, uint32_t numel);
+__global__ void cg_reduce(
+    T *in, T *out, uint32_t numel, bool clean_final_block);
 
 namespace utils {
 

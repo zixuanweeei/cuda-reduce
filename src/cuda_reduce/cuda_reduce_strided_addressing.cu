@@ -10,7 +10,8 @@ namespace cg = cooperative_groups;
 namespace rd {
 
 template <typename T>
-__global__ void reduce1(T *in, T *out, uint32_t numel) {
+__global__ void reduce1(
+    T *in, T *out, uint32_t numel, bool clean_final_block) {
   cg::thread_block cta = cg::this_thread_block();
   T *smem = shared_memory_t<T> {};
 
@@ -41,13 +42,14 @@ __global__ void reduce1(T *in, T *out, uint32_t numel) {
   }
 
   if (tid == 0) out[blockIdx.x] = smem[0];
-  reduce_last_block_clean(smem, out);
+  if (clean_final_block) reduce_last_block_clean(smem, out);
 }
 
-template __global__ void reduce1<float>(float *in, float *out, uint32_t numel);
+template __global__ void reduce1<float>(
+    float *in, float *out, uint32_t numel, bool);
 template __global__ void reduce1<int32_t>(
-    int32_t *in, int32_t *out, uint32_t numel);
+    int32_t *in, int32_t *out, uint32_t numel, bool);
 template __global__ void reduce1<double>(
-    double *in, double *out, uint32_t numel);
+    double *in, double *out, uint32_t numel, bool);
 
 } // namespace rd
