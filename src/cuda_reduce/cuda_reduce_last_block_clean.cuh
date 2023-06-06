@@ -1,8 +1,6 @@
 #include <cuda.h>
 #include <cuda_runtime_api.h>
 
-#include <cstdio>
-
 #include "warp_reduce_sum.cuh"
 
 namespace rd {
@@ -16,18 +14,14 @@ __device__ void reduce_last_block_clean(T *smem, T *in) {
   uint32_t this_block_size = blockDim.x;
   uint32_t tid = threadIdx.x;
 
-  is_last_block_done = false;
-  __syncthreads();
-
   if (threadIdx.x == 0) {
-    // Thread 0 makes sure that the incrementation
-    // of the "semaphore" variable is only performed after
-    // the partial sum has been written to global memory.
+    // Thread 0 makes sure that the incrementation of the "semaphore" variable
+    // is only performed after the partial sum has been written to global
+    // memory.
     __threadfence();
     // Thread 0 signals that it is done.
-    unsigned int value = atomicInc(&semaphore, gridDim.x);
-    // Thread 0 determines if its block is the last
-    // block to be done.
+    uint32_t value = atomicInc(&semaphore, gridDim.x);
+    // Thread 0 determines if its block is the last block to be done.
     is_last_block_done = (value == (gridDim.x - 1));
   }
 
