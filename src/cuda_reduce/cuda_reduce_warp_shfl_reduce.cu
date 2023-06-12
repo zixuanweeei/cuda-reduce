@@ -30,7 +30,7 @@ __global__ void reduce4(
   smem[tid] = sum;
   cg::sync(cta);
 
-  for (uint32_t strides = blockDim.x / 2; strides > 32; strides >>= 1) {
+  for (uint32_t strides = block_size / 2; strides > 32; strides >>= 1) {
     // Use sequential/contiguous addressing
     //
     // step 0: 0 1 2 3 + (4 5 6 7)
