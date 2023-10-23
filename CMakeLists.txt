@@ -30,3 +30,4 @@ endif()
 include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
 add_subdirectory(src)
+add_subdirectory(tests)
